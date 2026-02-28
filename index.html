@@ -1,10 +1,7 @@
 <script>
 
-let energy = localStorage.getItem("energy") || 0;
-energy = parseInt(energy);
-
-let usedTruths = [];
-let usedChallenges = [];
+let energy = parseInt(localStorage.getItem("energy") || 0);
+let usedItems = { verdade:{}, desafio:{} };
 
 function getLevel(){
   if(energy < 25) return 1;
@@ -23,89 +20,108 @@ function updateEnergy(){
     3:"Nível 3 – Intensidade",
     4:"Nível 4 – Entrega"
   };
-  document.getElementById("levelText").innerText = levels[getLevel()];
+
+  if(energy >= 100){
+    document.getElementById("levelText").innerText = "🔥 Ritual Final Desbloqueado";
+  }else{
+    document.getElementById("levelText").innerText = levels[getLevel()];
+  }
 }
 
-const truths = {
-1:[
-"Qual parte do meu corpo você sente mais vontade de tocar?",
-"O que em mim mais desperta seu desejo?",
-"Qual foi o momento mais provocante que tivemos?",
-"Quando você sente mais química entre nós?",
-"Que tipo de toque mais te arrepia?"
+const database = {
+1:{
+verdade:[
+"O que em mim mais te faz perder o foco?",
+"Qual parte do meu corpo você observa primeiro?",
+"Quando você sente que nossa tensão começa a subir?",
+"O que mais te arrepia quando estou perto?",
+"Qual toque meu você mais espera?"
 ],
-2:[
-"Como você gosta de ser provocado antes de algo mais intenso?",
-"Qual fantasia leve você gostaria de experimentar comigo?",
-"O que te faz perder o controle aos poucos?",
-"Como você prefere que eu conduza você?",
-"O que mais aumenta sua excitação lentamente?"
-],
-3:[
-"Qual cenário íntimo mais te estimula imaginar comigo?",
-"Você prefere dominar ou ser conduzido? Por quê?",
-"O que mais te deixa vulnerável comigo?",
-"Qual parte do seu corpo quer que eu explore mais?",
-"Qual foi seu pensamento mais ousado recentemente?"
-],
-4:[
-"Qual limite você sente vontade de explorar juntos?",
-"Qual fantasia você ainda não teve coragem de contar?",
-"O que te faria se entregar completamente?",
-"Como você gosta que a tensão aumente antes do ápice?",
-"Qual momento nosso você quer repetir de forma mais intensa?"
+desafio:[
+"Mantenha contato visual por 60 segundos.",
+"Sussurre algo que aumente a tensão.",
+"Passe as mãos lentamente pelo meu braço.",
+"Aproxime seu rosto do meu sem me tocar.",
+"Segure minha cintura por 1 minuto."
 ]
-};
-
-const challenges = {
-1:[
-"Mantenha contato visual por 40 segundos.",
-"Sussurre algo provocante no ouvido.",
-"Toque lentamente minhas mãos por 1 minuto.",
-"Aproxime-se e segure minha cintura sem falar.",
-"Faça um elogio sensual em voz baixa."
+},
+2:{
+verdade:[
+"Qual tipo de provocação te deixa mais vulnerável?",
+"Você prefere dominar ou ser provocado?",
+"O que te excita de forma lenta?",
+"Qual lembrança íntima nossa te marcou?",
+"O que faz seu corpo reagir imediatamente?"
 ],
-2:[
+desafio:[
 "Beije lentamente por 1 minuto.",
-"Explore meu pescoço com delicadeza.",
+"Explore meu pescoço com calma.",
 "Conduza meu movimento por 2 minutos.",
 "Use apenas o toque para provocar.",
-"Deslize as mãos pelo meu corpo com calma."
+"Controle o ritmo do momento por 1 minuto."
+]
+},
+3:{
+verdade:[
+"Qual fantasia leve você gostaria de realizar?",
+"O que mais te faz perder o controle comigo?",
+"Qual parte sua quer ser explorada agora?",
+"Qual cenário mais aumenta sua excitação?",
+"O que te faz querer ir além?"
 ],
-3:[
+desafio:[
 "Tire uma peça de roupa com elegância.",
 "Assuma o controle por 2 minutos.",
-"Guie um momento de provocação prolongada.",
-"Use apenas o olhar para me provocar.",
-"Segure meus pulsos suavemente e conduza."
-],
-4:[
-"Guie um momento intenso sem falar.",
-"Provoque lentamente até eu pedir para continuar.",
-"Use apenas toques leves por 2 minutos.",
-"Controle o ritmo completamente.",
-"Descreva em voz baixa o que deseja fazer."
+"Provoque apenas com o olhar.",
+"Guie um momento mais intenso.",
+"Use apenas toques lentos por 2 minutos."
 ]
+},
+4:{
+verdade:[
+"Qual limite você gostaria de ultrapassar juntos?",
+"Qual pensamento ousado você guarda?",
+"O que faria você se entregar completamente?",
+"Como você gosta que a tensão atinja o ápice?",
+"O que mais desperta seu lado selvagem?"
+],
+desafio:[
+"Guie um momento intenso sem falar.",
+"Controle completamente o ritmo.",
+"Provoque até eu pedir para continuar.",
+"Descreva em voz baixa o que deseja fazer.",
+"Use apenas toque leve por 3 minutos."
+]
+}
 };
 
-function getRandom(list, usedArray){
-  if(usedArray.length >= list.length){
-    usedArray.length = 0;
+function getItem(type){
+  const level = getLevel();
+  const list = database[level][type];
+
+  if(!usedItems[type][level]){
+    usedItems[type][level] = [];
   }
 
-  let available = list.filter(item => !usedArray.includes(item));
+  if(usedItems[type][level].length >= list.length){
+    usedItems[type][level] = [];
+  }
+
+  let available = list.filter(i => !usedItems[type][level].includes(i));
   let random = available[Math.floor(Math.random()*available.length)];
-  usedArray.push(random);
+
+  usedItems[type][level].push(random);
   return random;
 }
 
 function chooseMode(type){
-  const level = getLevel();
-  const list = type === 'verdade' ? truths[level] : challenges[level];
-  const used = type === 'verdade' ? usedTruths : usedChallenges;
+  if(energy >= 100){
+    document.getElementById("prompt").innerText =
+    "🔥 Ritual Final: conduzam um momento íntimo livre, seguindo apenas a tensão construída até aqui.";
+  }else{
+    document.getElementById("prompt").innerText = getItem(type);
+  }
 
-  const random = getRandom(list, used);
-  document.getElementById("prompt").innerText = random;
   switchScreen("playScreen");
 }
 
