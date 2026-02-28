@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Midnight Cards</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0B0B0D;
+      color: #C6A75E;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .card {
+      background: #111;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(198,167,94,0.4);
+      width: 80%;
+      max-width: 350px;
+    }
+
+    button {
+      background: #C6A75E;
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    .stars {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Midnight Cards</h1>
+  <h2 id="name">Toque para sortear</h2>
+  <div class="stars" id="stars"></div>
+  <p id="desc"></p>
+  <button onclick="drawCard()">Sortear Carta</button>
+</div>
+
+<script>
+const cards = [
+  {name:"Entrelaço Suave", intensity:2, desc:"Conexão lenta com contato visual."},
+  {name:"Abraço Ardente", intensity:4, desc:"Aumente a proximidade e o ritmo."},
+  {name:"Olhar Profundo", intensity:1, desc:"Segurem o olhar por 1 minuto."},
+  {name:"Sintonia Lenta", intensity:3, desc:"Movimento sincronizado por 3 minutos."},
+  {name:"Domínio Suave", intensity:5, desc:"Um conduz por 2 minutos."}
+];
+
+function drawCard() {
+  const random = cards[Math.floor(Math.random() * cards.length)];
+  document.getElementById("name").innerText = random.name;
+  document.getElementById("desc").innerText = random.desc;
+  document.getElementById("stars").innerText = "★".repeat(random.intensity);
+}
+</script>
+
+</body>
+</html>
