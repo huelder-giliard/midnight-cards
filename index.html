@@ -41,6 +41,11 @@ button{
   color:#000;
 }
 
+.secondary{
+  background:#333;
+  color:#C6A75E;
+}
+
 .hidden{ display:none; }
 
 .energy-container{
@@ -80,6 +85,7 @@ button{
   <h2>Ritual</h2>
   <button onclick="chooseMode('verdade')">Verdade</button>
   <button onclick="chooseMode('desafio')">Desafio</button>
+  <button class="secondary" onclick="resetGame()">Reiniciar Ritual</button>
 </div>
 
 <div id="playScreen" class="card hidden">
@@ -95,88 +101,76 @@ button{
 
 let energy = parseInt(localStorage.getItem("energy") || 0);
 
-let history = {
-  verdade: {},
-  desafio: {}
-};
+// 🔒 Garantia de segurança
+if(isNaN(energy) || energy < 0){
+  energy = 0;
+}
+
+// 🔒 Impede iniciar já no ritual final
+if(energy > 100){
+  energy = 0;
+  localStorage.setItem("energy", energy);
+}
+
+let history = { verdade:{}, desafio:{} };
 
 const database = {
-
 1:{
 verdade:[
 "O que mais te provoca em mim?",
 "Qual toque meu você mais gosta?",
 "Quando nossa tensão começa a subir?",
-"O que mais te arrepia quando estou perto?",
-"Qual parte do meu corpo você observa primeiro?"
+"O que mais te arrepia quando estou perto?"
 ],
 desafio:[
 "Mantenha contato visual por 40 segundos.",
 "Sussurre algo provocante.",
 "Aproxime-se lentamente.",
-"Toque minhas mãos por 1 minuto.",
-"Faça um elogio sensual em voz baixa."
+"Toque minhas mãos por 1 minuto."
 ]
 },
-
 2:{
 verdade:[
 "O que te excita de forma lenta?",
 "Qual fantasia leve você gostaria de explorar?",
-"O que faz seu corpo reagir imediatamente?",
-"Como você prefere ser provocado?",
-"Qual lembrança íntima nossa mais te marcou?"
+"O que faz seu corpo reagir imediatamente?"
 ],
 desafio:[
 "Beije lentamente por 1 minuto.",
 "Conduza o momento por 2 minutos.",
-"Explore meu pescoço com delicadeza.",
-"Use apenas o toque para provocar.",
-"Segure minha cintura com firmeza suave."
+"Explore meu pescoço com delicadeza."
 ]
 },
-
 3:{
 verdade:[
 "Qual pensamento ousado você já teve comigo?",
 "O que te faz perder o controle?",
-"Qual parte sua quer ser mais explorada?",
-"Qual cenário mais aumenta sua excitação?",
-"Você prefere dominar ou ser dominado?"
+"Qual parte sua quer ser mais explorada?"
 ],
 desafio:[
 "Tire uma peça de roupa com elegância.",
 "Assuma o controle por 2 minutos.",
-"Provoque apenas com o olhar.",
-"Guie um momento mais intenso.",
-"Controle o ritmo por 2 minutos."
+"Provoque apenas com o olhar."
 ]
 },
-
 4:{
 verdade:[
 "Qual limite você quer explorar juntos?",
-"O que te faria se entregar completamente?",
-"Qual fantasia você ainda não contou?",
-"Como você gosta que a tensão atinja o ápice?",
-"O que desperta seu lado mais intenso?"
+"O que te faria se entregar completamente?"
 ],
 desafio:[
 "Guie um momento intenso sem falar.",
-"Controle totalmente o ritmo por 3 minutos.",
-"Provoque até eu pedir para continuar.",
-"Descreva em voz baixa o que deseja fazer.",
-"Use apenas toques leves por 3 minutos."
+"Controle totalmente o ritmo por 3 minutos."
 ]
 }
-
 };
 
 function getLevel(){
   if(energy < 25) return 1;
   if(energy < 50) return 2;
   if(energy < 75) return 3;
-  return 4;
+  if(energy < 100) return 4;
+  return 5; // Ritual Final
 }
 
 function updateUI(){
@@ -187,20 +181,19 @@ function updateUI(){
     1:"Nível 1 – Aquecimento",
     2:"Nível 2 – Conexão",
     3:"Nível 3 – Intensidade",
-    4:"Nível 4 – Entrega"
+    4:"Nível 4 – Entrega",
+    5:"🔥 Ritual Final"
   };
 
-  if(energy >= 100){
-    document.getElementById("levelText").innerText =
-    "🔥 Ritual Final Desbloqueado";
-  }else{
-    document.getElementById("levelText").innerText =
-    labels[getLevel()];
-  }
+  document.getElementById("levelText").innerText = labels[getLevel()];
 }
 
 function getUniqueItem(type){
   const level = getLevel();
+  if(level === 5){
+    return "🔥 Ritual Final: conduzam um momento íntimo livre, seguindo apenas a tensão construída até aqui.";
+  }
+
   const list = database[level][type];
 
   if(!history[type][level]){
@@ -224,22 +217,26 @@ function getUniqueItem(type){
 }
 
 function chooseMode(type){
-  if(energy >= 100){
-    document.getElementById("prompt").innerText =
-    "🔥 Ritual Final: conduzam um momento íntimo livre, seguindo apenas a tensão construída até aqui.";
-  }else{
-    document.getElementById("prompt").innerText =
+  document.getElementById("prompt").innerText =
     getUniqueItem(type);
-  }
-
   switchScreen("playScreen");
 }
 
 function complete(points){
   energy += points;
+
+  if(energy > 100) energy = 100;
+
   localStorage.setItem("energy", energy);
   updateUI();
   switchScreen("home");
+}
+
+function resetGame(){
+  energy = 0;
+  localStorage.setItem("energy", energy);
+  history = { verdade:{}, desafio:{} };
+  updateUI();
 }
 
 function switchScreen(screen){
