@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
+ <!DOCTYPE html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Midnight – Kamasutra Edition</title>
+<title>Midnight – Conexão</title>
 
 <style>
 body{
@@ -51,6 +51,14 @@ svg{
   font-size:40px;
   margin:20px 0;
 }
+
+.fine-line{
+  stroke:#C6A75E;
+  stroke-width:2;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
 </style>
 </head>
 
@@ -59,8 +67,8 @@ svg{
 <div class="container">
 
 <div id="home" class="card">
-  <h2>Kamasutra Ritual</h2>
-  <button onclick="drawCard()">Sortear Posição</button>
+  <h2>Midnight Ritual</h2>
+  <button onclick="drawCard()">Sortear Momento</button>
 </div>
 
 <div id="cardScreen" class="card hidden">
@@ -80,16 +88,27 @@ svg{
 <script>
 
 const cards = [
-
 {
 name:"Lótus",
-desc:"Sentados frente a frente com conexão visual.",
+desc:"Sentados frente a frente, abraçados.",
 svg:`
 <svg width="220" height="220" viewBox="0 0 220 220">
-<path d="M110 80 Q80 120 110 160 Q140 120 110 80" 
-stroke="#C6A75E" stroke-width="3" fill="none"/>
-<circle cx="95" cy="70" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
-<circle cx="125" cy="70" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+  <!-- Cabeças -->
+  <circle cx="95" cy="70" r="10" class="fine-line"/>
+  <circle cx="125" cy="70" r="10" class="fine-line"/>
+
+  <!-- Tronco esquerdo -->
+  <path d="M95 80 Q85 110 95 140" class="fine-line"/>
+  
+  <!-- Tronco direito -->
+  <path d="M125 80 Q135 110 125 140" class="fine-line"/>
+
+  <!-- Pernas cruzadas -->
+  <path d="M95 140 Q75 165 110 170" class="fine-line"/>
+  <path d="M125 140 Q145 165 110 170" class="fine-line"/>
+
+  <!-- Braços envolvendo -->
+  <path d="M95 100 Q110 105 125 100" class="fine-line"/>
 </svg>`
 },
 
@@ -98,25 +117,28 @@ name:"Conchinha",
 desc:"Deitados lado a lado em proximidade.",
 svg:`
 <svg width="220" height="220" viewBox="0 0 220 220">
-<path d="M60 130 Q110 80 160 130" 
-stroke="#C6A75E" stroke-width="3" fill="none"/>
-<circle cx="85" cy="95" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
-<circle cx="125" cy="95" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+  <circle cx="85" cy="95" r="10" class="fine-line"/>
+  <circle cx="115" cy="100" r="10" class="fine-line"/>
+
+  <path d="M85 105 Q95 130 115 140" class="fine-line"/>
+  <path d="M115 110 Q135 135 155 145" class="fine-line"/>
 </svg>`
 },
 
 {
-name:"Cavalgada",
-desc:"Um conduz o ritmo enquanto mantém contato.",
+name:"Frente a Frente",
+desc:"Em pé, próximos, mantendo contato visual.",
 svg:`
 <svg width="220" height="220" viewBox="0 0 220 220">
-<path d="M110 60 Q80 140 110 170 Q140 140 110 60" 
-stroke="#C6A75E" stroke-width="3" fill="none"/>
-<circle cx="110" cy="50" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
-<circle cx="110" cy="95" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+  <circle cx="90" cy="70" r="10" class="fine-line"/>
+  <circle cx="130" cy="70" r="10" class="fine-line"/>
+
+  <path d="M90 80 Q90 120 90 160" class="fine-line"/>
+  <path d="M130 80 Q130 120 130 160" class="fine-line"/>
+
+  <path d="M90 110 Q110 120 130 110" class="fine-line"/>
 </svg>`
 }
-
 ];
 
 let timeLeft = 60;
