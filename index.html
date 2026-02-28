@@ -15,12 +15,12 @@ body{
   justify-content:center;
   align-items:center;
   height:100vh;
-  text-align:center;
 }
 
 .container{
   width:90%;
   max-width:400px;
+  text-align:center;
 }
 
 .card{
@@ -28,10 +28,6 @@ body{
   padding:25px;
   border-radius:25px;
   box-shadow:0 0 30px rgba(198,167,94,0.3);
-}
-
-h1{
-  font-size:20px;
 }
 
 button{
@@ -44,19 +40,30 @@ button{
   width:100%;
 }
 
+.hidden{ display:none; }
+
 .stars{
   margin:10px 0;
-  font-size:18px;
   letter-spacing:3px;
 }
 
-.timer{
-  font-size:22px;
-  margin-top:15px;
+.scoreboard{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:15px;
+  font-size:14px;
 }
 
-.hidden{
-  display:none;
+.timer-circle{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  border:6px solid #C6A75E;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:28px;
+  margin:20px auto;
 }
 </style>
 </head>
@@ -65,14 +72,18 @@ button{
 
 <div class="container">
 
+<div class="card scoreboard">
+  <div>👤 Jogador 1: <span id="score1">0</span></div>
+  <div>👤 Jogador 2: <span id="score2">0</span></div>
+</div>
+
 <div id="home" class="card">
-  <h1>Midnight Cards</h1>
-  <p id="userId"></p>
+  <h2>Midnight Cards</h2>
   <button onclick="drawCard()">Sortear Carta</button>
 </div>
 
 <div id="cardScreen" class="card hidden">
-  <h2 id="name"></h2>
+  <h3 id="name"></h3>
   <div class="stars" id="stars"></div>
   <p id="desc"></p>
   <button onclick="startChallenge()">Iniciar Desafio</button>
@@ -80,25 +91,21 @@ button{
 </div>
 
 <div id="challengeScreen" class="card hidden">
-  <h2>Modo Desafio</h2>
-  <div class="timer" id="timer">60</div>
-  <button onclick="finishChallenge()">Concluir</button>
+  <h3>Modo Desafio</h3>
+  <div class="timer-circle" id="timer">60</div>
+  <button onclick="finishChallenge(1)">Ponto Jogador 1</button>
+  <button onclick="finishChallenge(2)">Ponto Jogador 2</button>
 </div>
 
 </div>
 
 <script>
 
-// LOGIN ANÔNIMO SIMPLES
-let userId = localStorage.getItem("midnight_user");
-if(!userId){
-  userId = "User_" + Math.floor(Math.random()*100000);
-  localStorage.setItem("midnight_user", userId);
-}
-document.getElementById("userId").innerText = "ID: " + userId;
+let score1 = localStorage.getItem("score1") || 0;
+let score2 = localStorage.getItem("score2") || 0;
+document.getElementById("score1").innerText = score1;
+document.getElementById("score2").innerText = score2;
 
-
-// 52 CARTAS
 const cards = [];
 for(let i=1;i<=52;i++){
   cards.push({
@@ -113,8 +120,6 @@ let currentCard = null;
 let countdown = null;
 let timeLeft = 60;
 
-
-// FUNÇÕES
 function drawCard(){
   currentCard = cards[Math.floor(Math.random()*cards.length)];
   document.getElementById("name").innerText = currentCard.name;
@@ -137,12 +142,19 @@ function startChallenge(){
   },1000);
 }
 
-function finishChallenge(){
+function finishChallenge(player){
   clearInterval(countdown);
-  let score = localStorage.getItem("score") || 0;
-  score++;
-  localStorage.setItem("score", score);
-  alert("Desafio concluído! Pontuação: "+score);
+
+  if(player === 1){
+    score1++;
+    localStorage.setItem("score1", score1);
+    document.getElementById("score1").innerText = score1;
+  }else{
+    score2++;
+    localStorage.setItem("score2", score2);
+    document.getElementById("score2").innerText = score2;
+  }
+
   goHome();
 }
 
