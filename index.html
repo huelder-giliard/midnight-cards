@@ -1,14 +1,14 @@
- <!DOCTYPE html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Midnight – Conexão</title>
+<title>Ritual – Verdade ou Desafio</title>
 
 <style>
 body{
   margin:0;
-  background:#0B0B0D;
+  background:radial-gradient(circle at center,#1a1a1f 0%,#0B0B0D 70%);
   color:#C6A75E;
   font-family:Georgia, serif;
   display:flex;
@@ -24,7 +24,7 @@ body{
 }
 
 .card{
-  background:#111;
+  background:rgba(20,20,25,0.95);
   padding:30px;
   border-radius:30px;
   box-shadow:0 0 40px rgba(198,167,94,0.25);
@@ -36,28 +36,33 @@ button{
   padding:14px;
   border-radius:15px;
   font-weight:bold;
-  margin-top:15px;
+  margin-top:12px;
   width:100%;
   color:#000;
 }
 
 .hidden{ display:none; }
 
-svg{
-  margin:20px 0;
+.energy-container{
+  width:100%;
+  height:12px;
+  background:#222;
+  border-radius:10px;
+  margin-bottom:15px;
+  overflow:hidden;
 }
 
-.timer{
-  font-size:40px;
-  margin:20px 0;
+.energy-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(to right,#8B0000,#C6A75E);
+  transition:width 0.6s ease;
 }
 
-.fine-line{
-  stroke:#C6A75E;
-  stroke-width:2;
-  fill:none;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+.level{
+  font-size:13px;
+  opacity:0.7;
+  margin-bottom:10px;
 }
 </style>
 </head>
@@ -66,113 +71,113 @@ svg{
 
 <div class="container">
 
+<div class="energy-container">
+  <div class="energy-bar" id="energyBar"></div>
+</div>
+<p class="level" id="levelText">Nível 1 – Aquecimento</p>
+
 <div id="home" class="card">
-  <h2>Midnight Ritual</h2>
-  <button onclick="drawCard()">Sortear Momento</button>
+  <h2>Ritual</h2>
+  <button onclick="chooseMode('verdade')">Verdade</button>
+  <button onclick="chooseMode('desafio')">Desafio</button>
 </div>
 
-<div id="cardScreen" class="card hidden">
-  <h3 id="name"></h3>
-  <div id="silhouette"></div>
-  <p id="desc"></p>
-  <button onclick="startMoment()">Iniciar</button>
-</div>
-
-<div id="momentScreen" class="card hidden">
-  <h3>Conectem-se</h3>
-  <div class="timer" id="timer">60</div>
+<div id="playScreen" class="card hidden">
+  <h3 id="prompt"></h3>
+  <button onclick="complete(5)">Leve</button>
+  <button onclick="complete(8)">Intenso</button>
+  <button onclick="complete(10)">Marcante</button>
 </div>
 
 </div>
 
 <script>
 
-const cards = [
-{
-name:"Lótus",
-desc:"Sentados frente a frente, abraçados.",
-svg:`
-<svg width="220" height="220" viewBox="0 0 220 220">
-  <!-- Cabeças -->
-  <circle cx="95" cy="70" r="10" class="fine-line"/>
-  <circle cx="125" cy="70" r="10" class="fine-line"/>
+let energy = localStorage.getItem("energy") || 0;
+energy = parseInt(energy);
+updateEnergy();
 
-  <!-- Tronco esquerdo -->
-  <path d="M95 80 Q85 110 95 140" class="fine-line"/>
-  
-  <!-- Tronco direito -->
-  <path d="M125 80 Q135 110 125 140" class="fine-line"/>
-
-  <!-- Pernas cruzadas -->
-  <path d="M95 140 Q75 165 110 170" class="fine-line"/>
-  <path d="M125 140 Q145 165 110 170" class="fine-line"/>
-
-  <!-- Braços envolvendo -->
-  <path d="M95 100 Q110 105 125 100" class="fine-line"/>
-</svg>`
-},
-
-{
-name:"Conchinha",
-desc:"Deitados lado a lado em proximidade.",
-svg:`
-<svg width="220" height="220" viewBox="0 0 220 220">
-  <circle cx="85" cy="95" r="10" class="fine-line"/>
-  <circle cx="115" cy="100" r="10" class="fine-line"/>
-
-  <path d="M85 105 Q95 130 115 140" class="fine-line"/>
-  <path d="M115 110 Q135 135 155 145" class="fine-line"/>
-</svg>`
-},
-
-{
-name:"Frente a Frente",
-desc:"Em pé, próximos, mantendo contato visual.",
-svg:`
-<svg width="220" height="220" viewBox="0 0 220 220">
-  <circle cx="90" cy="70" r="10" class="fine-line"/>
-  <circle cx="130" cy="70" r="10" class="fine-line"/>
-
-  <path d="M90 80 Q90 120 90 160" class="fine-line"/>
-  <path d="M130 80 Q130 120 130 160" class="fine-line"/>
-
-  <path d="M90 110 Q110 120 130 110" class="fine-line"/>
-</svg>`
-}
-];
-
-let timeLeft = 60;
-let countdown;
-
-function drawCard(){
-  const random = cards[Math.floor(Math.random()*cards.length)];
-  document.getElementById("name").innerText = random.name;
-  document.getElementById("desc").innerText = random.desc;
-  document.getElementById("silhouette").innerHTML = random.svg;
-  switchScreen("cardScreen");
+function getLevel(){
+  if(energy < 25) return 1;
+  if(energy < 50) return 2;
+  if(energy < 75) return 3;
+  return 4;
 }
 
-function startMoment(){
-  timeLeft = 60;
-  document.getElementById("timer").innerText = timeLeft;
-  switchScreen("momentScreen");
+function updateEnergy(){
+  let percent = Math.min(energy,100);
+  document.getElementById("energyBar").style.width = percent + "%";
 
-  countdown = setInterval(()=>{
-    timeLeft--;
-    document.getElementById("timer").innerText = timeLeft;
-    if(timeLeft<=0){
-      clearInterval(countdown);
-      switchScreen("home");
-    }
-  },1000);
+  const level = getLevel();
+  const levels = {
+    1:"Nível 1 – Aquecimento",
+    2:"Nível 2 – Conexão",
+    3:"Nível 3 – Intensidade",
+    4:"Nível 4 – Entrega"
+  };
+  document.getElementById("levelText").innerText = levels[level];
+}
+
+const truths = {
+  1:[
+    "Qual parte do meu corpo você mais gosta?",
+    "Quando você mais sentiu desejo por mim?"
+  ],
+  2:[
+    "O que mais te excita na nossa química?",
+    "Qual fantasia leve você nunca me contou?"
+  ],
+  3:[
+    "Qual cenário mais te provoca imaginar comigo?",
+    "Qual momento íntimo nosso ficou na sua mente?"
+  ],
+  4:[
+    "Qual pensamento ousado você já teve comigo?",
+    "Qual limite você gostaria de explorar juntos?"
+  ]
+};
+
+const challenges = {
+  1:[
+    "Mantenha contato visual por 30 segundos.",
+    "Sussurre algo provocante."
+  ],
+  2:[
+    "Beije lentamente por 1 minuto.",
+    "Conduza um toque demorado."
+  ],
+  3:[
+    "Tire uma peça de roupa com elegância.",
+    "Assuma o controle por 2 minutos."
+  ],
+  4:[
+    "Guie um momento de proximidade intensa.",
+    "Descreva em voz baixa o que deseja fazer."
+  ]
+};
+
+function chooseMode(type){
+  const level = getLevel();
+  const list = type === 'verdade' ? truths[level] : challenges[level];
+  const random = list[Math.floor(Math.random()*list.length)];
+  document.getElementById("prompt").innerText = random;
+  switchScreen("playScreen");
+}
+
+function complete(points){
+  energy += points;
+  localStorage.setItem("energy", energy);
+  updateEnergy();
+  switchScreen("home");
 }
 
 function switchScreen(screen){
   document.getElementById("home").classList.add("hidden");
-  document.getElementById("cardScreen").classList.add("hidden");
-  document.getElementById("momentScreen").classList.add("hidden");
+  document.getElementById("playScreen").classList.add("hidden");
   document.getElementById(screen).classList.remove("hidden");
 }
+
+updateEnergy();
 
 </script>
 
