@@ -1,7 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ritual – Verdade ou Desafio</title>
+
+<style>
+body{
+  margin:0;
+  background:#0B0B0D;
+  color:#C6A75E;
+  font-family:Georgia, serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  width:90%;
+  max-width:420px;
+  text-align:center;
+}
+
+.card{
+  background:#111;
+  padding:30px;
+  border-radius:30px;
+  box-shadow:0 0 40px rgba(198,167,94,0.25);
+}
+
+button{
+  background:linear-gradient(145deg,#C6A75E,#a88d4f);
+  border:none;
+  padding:14px;
+  border-radius:15px;
+  font-weight:bold;
+  margin-top:12px;
+  width:100%;
+  color:#000;
+}
+
+.hidden{ display:none; }
+
+.energy-container{
+  width:100%;
+  height:12px;
+  background:#222;
+  border-radius:10px;
+  margin-bottom:15px;
+  overflow:hidden;
+}
+
+.energy-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(to right,#8B0000,#C6A75E);
+  transition:width 0.6s ease;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="energy-container">
+  <div class="energy-bar" id="energyBar"></div>
+</div>
+<p id="levelText"></p>
+
+<div id="home" class="card">
+  <h2>Ritual</h2>
+  <button onclick="chooseMode('verdade')">Verdade</button>
+  <button onclick="chooseMode('desafio')">Desafio</button>
+</div>
+
+<div id="playScreen" class="card hidden">
+  <h3 id="prompt"></h3>
+  <button onclick="complete(5)">Leve</button>
+  <button onclick="complete(8)">Intenso</button>
+  <button onclick="complete(10)">Marcante</button>
+</div>
+
+</div>
+
 <script>
 
 let energy = parseInt(localStorage.getItem("energy") || 0);
-let usedItems = { verdade:{}, desafio:{} };
+
+const database = {
+1:{
+verdade:[
+"O que mais te provoca em mim?",
+"Qual toque meu você mais gosta?",
+"Quando nossa tensão começa a subir?"
+],
+desafio:[
+"Mantenha contato visual por 40 segundos.",
+"Sussurre algo provocante.",
+"Aproxime-se lentamente."
+]
+},
+2:{
+verdade:[
+"O que te excita de forma lenta?",
+"Qual fantasia leve você gostaria de explorar?"
+],
+desafio:[
+"Beije lentamente por 1 minuto.",
+"Conduza o momento por 2 minutos."
+]
+},
+3:{
+verdade:[
+"Qual pensamento ousado você já teve comigo?",
+"O que te faz perder o controle?"
+],
+desafio:[
+"Tire uma peça de roupa com elegância.",
+"Assuma o controle por 2 minutos."
+]
+},
+4:{
+verdade:[
+"Qual limite você quer explorar juntos?"
+],
+desafio:[
+"Guie um momento intenso sem falar."
+]
+}
+};
 
 function getLevel(){
   if(energy < 25) return 1;
@@ -10,11 +139,11 @@ function getLevel(){
   return 4;
 }
 
-function updateEnergy(){
+function updateUI(){
   let percent = Math.min(energy,100);
   document.getElementById("energyBar").style.width = percent + "%";
 
-  const levels = {
+  const labels = {
     1:"Nível 1 – Aquecimento",
     2:"Nível 2 – Conexão",
     3:"Nível 3 – Intensidade",
@@ -24,111 +153,22 @@ function updateEnergy(){
   if(energy >= 100){
     document.getElementById("levelText").innerText = "🔥 Ritual Final Desbloqueado";
   }else{
-    document.getElementById("levelText").innerText = levels[getLevel()];
+    document.getElementById("levelText").innerText = labels[getLevel()];
   }
-}
-
-const database = {
-1:{
-verdade:[
-"O que em mim mais te faz perder o foco?",
-"Qual parte do meu corpo você observa primeiro?",
-"Quando você sente que nossa tensão começa a subir?",
-"O que mais te arrepia quando estou perto?",
-"Qual toque meu você mais espera?"
-],
-desafio:[
-"Mantenha contato visual por 60 segundos.",
-"Sussurre algo que aumente a tensão.",
-"Passe as mãos lentamente pelo meu braço.",
-"Aproxime seu rosto do meu sem me tocar.",
-"Segure minha cintura por 1 minuto."
-]
-},
-2:{
-verdade:[
-"Qual tipo de provocação te deixa mais vulnerável?",
-"Você prefere dominar ou ser provocado?",
-"O que te excita de forma lenta?",
-"Qual lembrança íntima nossa te marcou?",
-"O que faz seu corpo reagir imediatamente?"
-],
-desafio:[
-"Beije lentamente por 1 minuto.",
-"Explore meu pescoço com calma.",
-"Conduza meu movimento por 2 minutos.",
-"Use apenas o toque para provocar.",
-"Controle o ritmo do momento por 1 minuto."
-]
-},
-3:{
-verdade:[
-"Qual fantasia leve você gostaria de realizar?",
-"O que mais te faz perder o controle comigo?",
-"Qual parte sua quer ser explorada agora?",
-"Qual cenário mais aumenta sua excitação?",
-"O que te faz querer ir além?"
-],
-desafio:[
-"Tire uma peça de roupa com elegância.",
-"Assuma o controle por 2 minutos.",
-"Provoque apenas com o olhar.",
-"Guie um momento mais intenso.",
-"Use apenas toques lentos por 2 minutos."
-]
-},
-4:{
-verdade:[
-"Qual limite você gostaria de ultrapassar juntos?",
-"Qual pensamento ousado você guarda?",
-"O que faria você se entregar completamente?",
-"Como você gosta que a tensão atinja o ápice?",
-"O que mais desperta seu lado selvagem?"
-],
-desafio:[
-"Guie um momento intenso sem falar.",
-"Controle completamente o ritmo.",
-"Provoque até eu pedir para continuar.",
-"Descreva em voz baixa o que deseja fazer.",
-"Use apenas toque leve por 3 minutos."
-]
-}
-};
-
-function getItem(type){
-  const level = getLevel();
-  const list = database[level][type];
-
-  if(!usedItems[type][level]){
-    usedItems[type][level] = [];
-  }
-
-  if(usedItems[type][level].length >= list.length){
-    usedItems[type][level] = [];
-  }
-
-  let available = list.filter(i => !usedItems[type][level].includes(i));
-  let random = available[Math.floor(Math.random()*available.length)];
-
-  usedItems[type][level].push(random);
-  return random;
 }
 
 function chooseMode(type){
-  if(energy >= 100){
-    document.getElementById("prompt").innerText =
-    "🔥 Ritual Final: conduzam um momento íntimo livre, seguindo apenas a tensão construída até aqui.";
-  }else{
-    document.getElementById("prompt").innerText = getItem(type);
-  }
-
+  const level = getLevel();
+  const list = database[level][type];
+  const random = list[Math.floor(Math.random()*list.length)];
+  document.getElementById("prompt").innerText = random;
   switchScreen("playScreen");
 }
 
 function complete(points){
   energy += points;
   localStorage.setItem("energy", energy);
-  updateEnergy();
+  updateUI();
   switchScreen("home");
 }
 
@@ -138,6 +178,9 @@ function switchScreen(screen){
   document.getElementById(screen).classList.remove("hidden");
 }
 
-updateEnergy();
+updateUI();
 
 </script>
+
+</body>
+</html>
