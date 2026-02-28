@@ -7,43 +7,53 @@
 
 <style>
 body{
-margin:0;
-background:#0B0B0D;
-color:#C6A75E;
-font-family:Arial, sans-serif;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-text-align:center;
+  margin:0;
+  background:#0B0B0D;
+  color:#C6A75E;
+  font-family:Arial, sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  text-align:center;
 }
 
 .card{
-background:#111;
-padding:30px;
-border-radius:20px;
-box-shadow:0 0 25px rgba(198,167,94,0.4);
-width:85%;
-max-width:350px;
+  background:#111;
+  padding:30px;
+  border-radius:25px;
+  box-shadow:0 0 30px rgba(198,167,94,0.35);
+  width:85%;
+  max-width:360px;
+}
+
+h1{
+  font-size:22px;
+  margin-bottom:10px;
+}
+
+h2{
+  margin-top:10px;
 }
 
 button{
-background:#C6A75E;
-border:none;
-padding:15px;
-border-radius:10px;
-font-weight:bold;
-margin-top:20px;
-width:100%;
+  background:#C6A75E;
+  border:none;
+  padding:15px;
+  border-radius:12px;
+  font-weight:bold;
+  margin-top:20px;
+  width:100%;
 }
 
 .stars{
-margin:10px 0;
-font-size:18px;
+  margin:10px 0;
+  font-size:18px;
+  letter-spacing:3px;
 }
 
 svg{
-margin:15px 0;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -53,10 +63,49 @@ margin:15px 0;
 <div class="card">
 <h1>Midnight Cards</h1>
 
-<svg id="silhouette" width="200" height="200" viewBox="0 0 200 200">
-<path d="M70 120 Q100 60 130 120" stroke="#C6A75E" stroke-width="4" fill="none"/>
-<circle cx="80" cy="90" r="10" stroke="#C6A75E" stroke-width="3" fill="none"/>
-<circle cx="120" cy="90" r="10" stroke="#C6A75E" stroke-width="3" fill="none"/>
+<!-- SILHUETA PREMIUM -->
+<svg width="240" height="220" viewBox="0 0 240 220">
+
+  <!-- Corpo esquerdo -->
+  <path d="
+    M80 170
+    Q85 130 100 110
+    Q110 100 105 85
+    Q100 70 90 80
+    Q75 95 70 130
+    Q65 155 80 170
+  "
+  stroke="#C6A75E"
+  stroke-width="2.5"
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"/>
+
+  <!-- Corpo direito -->
+  <path d="
+    M160 170
+    Q155 130 140 110
+    Q130 100 135 85
+    Q140 70 150 80
+    Q165 95 170 130
+    Q175 155 160 170
+  "
+  stroke="#C6A75E"
+  stroke-width="2.5"
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"/>
+
+  <!-- Aproximação dos rostos -->
+  <path d="
+    M105 95
+    Q120 105 135 95
+  "
+  stroke="#C6A75E"
+  stroke-width="2.5"
+  fill="none"
+  stroke-linecap="round"/>
+
 </svg>
 
 <h2 id="name">Toque para sortear</h2>
@@ -76,10 +125,10 @@ const cards = [
 ];
 
 function drawCard(){
-const random = cards[Math.floor(Math.random()*cards.length)];
-document.getElementById("name").innerText = random.name;
-document.getElementById("desc").innerText = random.desc;
-document.getElementById("stars").innerText = "★".repeat(random.intensity);
+  const random = cards[Math.floor(Math.random()*cards.length)];
+  document.getElementById("name").innerText = random.name;
+  document.getElementById("desc").innerText = random.desc;
+  document.getElementById("stars").innerText = "★".repeat(random.intensity);
 }
 </script>
 
