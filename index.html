@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Midnight – Conexão</title>
+<title>Midnight – Kamasutra Edition</title>
 
 <style>
 body{
   margin:0;
-  background:radial-gradient(circle at center,#1a1a1f 0%,#0B0B0D 70%);
+  background:#0B0B0D;
   color:#C6A75E;
-  font-family: 'Georgia', serif;
+  font-family:Georgia, serif;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -24,11 +24,10 @@ body{
 }
 
 .card{
-  background:rgba(20,20,25,0.95);
+  background:#111;
   padding:30px;
   border-radius:30px;
   box-shadow:0 0 40px rgba(198,167,94,0.25);
-  backdrop-filter: blur(8px);
 }
 
 button{
@@ -40,45 +39,17 @@ button{
   margin-top:15px;
   width:100%;
   color:#000;
-  font-size:14px;
 }
 
 .hidden{ display:none; }
 
-.energy-container{
-  width:100%;
-  height:12px;
-  background:#222;
-  border-radius:10px;
-  margin-bottom:15px;
-  overflow:hidden;
-}
-
-.energy-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(to right,#8B0000,#C6A75E);
-  transition:width 0.6s ease;
+svg{
+  margin:20px 0;
 }
 
 .timer{
   font-size:40px;
-  margin:25px 0;
-  letter-spacing:3px;
-}
-
-.subtitle{
-  font-size:14px;
-  opacity:0.7;
-}
-
-.fade{
-  animation:fadeIn 0.8s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(10px);}
-  to{opacity:1; transform:translateY(0);}
+  margin:20px 0;
 }
 </style>
 </head>
@@ -87,49 +58,65 @@ button{
 
 <div class="container">
 
-<div class="energy-container">
-  <div class="energy-bar" id="energyBar"></div>
-</div>
-<p class="subtitle">Energia da Conexão</p>
-
-<div id="home" class="card fade">
-  <h2>Midnight</h2>
-  <p class="subtitle">Toque para iniciar o ritual</p>
-  <button onclick="drawCard()">Sortear Momento</button>
+<div id="home" class="card">
+  <h2>Kamasutra Ritual</h2>
+  <button onclick="drawCard()">Sortear Posição</button>
 </div>
 
-<div id="cardScreen" class="card hidden fade">
+<div id="cardScreen" class="card hidden">
   <h3 id="name"></h3>
+  <div id="silhouette"></div>
   <p id="desc"></p>
-  <button onclick="startMoment()">Iniciar Conexão</button>
+  <button onclick="startMoment()">Iniciar</button>
 </div>
 
-<div id="momentScreen" class="card hidden fade">
+<div id="momentScreen" class="card hidden">
   <h3>Conectem-se</h3>
   <div class="timer" id="timer">60</div>
-</div>
-
-<div id="feedbackScreen" class="card hidden fade">
-  <h3>Como foi esse momento?</h3>
-  <button onclick="addEnergy(5)">❤️ Conectado</button>
-  <button onclick="addEnergy(8)">✨ Intenso</button>
-  <button onclick="addEnergy(10)">🔥 Marcante</button>
 </div>
 
 </div>
 
 <script>
 
-let energy = localStorage.getItem("energy") || 0;
-energy = parseInt(energy);
-updateEnergyBar();
-
 const cards = [
-  {name:"Olhar Profundo", desc:"Mantenham contato visual em silêncio."},
-  {name:"Respiração Sincronizada", desc:"Respirem no mesmo ritmo."},
-  {name:"Abraço Demorado", desc:"Permaneçam próximos sem falar."},
-  {name:"Toque Lento", desc:"Explorem o toque com delicadeza."},
-  {name:"Proximidade Silenciosa", desc:"Apenas sintam a presença um do outro."}
+
+{
+name:"Lótus",
+desc:"Sentados frente a frente com conexão visual.",
+svg:`
+<svg width="220" height="220" viewBox="0 0 220 220">
+<path d="M110 80 Q80 120 110 160 Q140 120 110 80" 
+stroke="#C6A75E" stroke-width="3" fill="none"/>
+<circle cx="95" cy="70" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+<circle cx="125" cy="70" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+</svg>`
+},
+
+{
+name:"Conchinha",
+desc:"Deitados lado a lado em proximidade.",
+svg:`
+<svg width="220" height="220" viewBox="0 0 220 220">
+<path d="M60 130 Q110 80 160 130" 
+stroke="#C6A75E" stroke-width="3" fill="none"/>
+<circle cx="85" cy="95" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+<circle cx="125" cy="95" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+</svg>`
+},
+
+{
+name:"Cavalgada",
+desc:"Um conduz o ritmo enquanto mantém contato.",
+svg:`
+<svg width="220" height="220" viewBox="0 0 220 220">
+<path d="M110 60 Q80 140 110 170 Q140 140 110 60" 
+stroke="#C6A75E" stroke-width="3" fill="none"/>
+<circle cx="110" cy="50" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+<circle cx="110" cy="95" r="8" stroke="#C6A75E" stroke-width="2" fill="none"/>
+</svg>`
+}
+
 ];
 
 let timeLeft = 60;
@@ -139,6 +126,7 @@ function drawCard(){
   const random = cards[Math.floor(Math.random()*cards.length)];
   document.getElementById("name").innerText = random.name;
   document.getElementById("desc").innerText = random.desc;
+  document.getElementById("silhouette").innerHTML = random.svg;
   switchScreen("cardScreen");
 }
 
@@ -152,28 +140,15 @@ function startMoment(){
     document.getElementById("timer").innerText = timeLeft;
     if(timeLeft<=0){
       clearInterval(countdown);
-      switchScreen("feedbackScreen");
+      switchScreen("home");
     }
   },1000);
-}
-
-function addEnergy(amount){
-  energy += amount;
-  localStorage.setItem("energy", energy);
-  updateEnergyBar();
-  switchScreen("home");
-}
-
-function updateEnergyBar(){
-  let percent = Math.min(energy,100);
-  document.getElementById("energyBar").style.width = percent+"%";
 }
 
 function switchScreen(screen){
   document.getElementById("home").classList.add("hidden");
   document.getElementById("cardScreen").classList.add("hidden");
   document.getElementById("momentScreen").classList.add("hidden");
-  document.getElementById("feedbackScreen").classList.add("hidden");
   document.getElementById(screen).classList.remove("hidden");
 }
 
