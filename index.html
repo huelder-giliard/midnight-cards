@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Midnight Cards</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Midnight – Conexão</title>
 
 <style>
 body{
   margin:0;
-  background:#0B0B0D;
+  background:radial-gradient(circle at center,#1a1a1f 0%,#0B0B0D 70%);
   color:#C6A75E;
-  font-family:Arial, sans-serif;
+  font-family: 'Georgia', serif;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -19,51 +19,66 @@ body{
 
 .container{
   width:90%;
-  max-width:400px;
+  max-width:420px;
   text-align:center;
 }
 
 .card{
-  background:#111;
-  padding:25px;
-  border-radius:25px;
-  box-shadow:0 0 30px rgba(198,167,94,0.3);
+  background:rgba(20,20,25,0.95);
+  padding:30px;
+  border-radius:30px;
+  box-shadow:0 0 40px rgba(198,167,94,0.25);
+  backdrop-filter: blur(8px);
 }
 
 button{
-  background:#C6A75E;
+  background:linear-gradient(145deg,#C6A75E,#a88d4f);
   border:none;
   padding:14px;
-  border-radius:12px;
+  border-radius:15px;
   font-weight:bold;
   margin-top:15px;
   width:100%;
+  color:#000;
+  font-size:14px;
 }
 
 .hidden{ display:none; }
 
-.stars{
-  margin:10px 0;
+.energy-container{
+  width:100%;
+  height:12px;
+  background:#222;
+  border-radius:10px;
+  margin-bottom:15px;
+  overflow:hidden;
+}
+
+.energy-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(to right,#8B0000,#C6A75E);
+  transition:width 0.6s ease;
+}
+
+.timer{
+  font-size:40px;
+  margin:25px 0;
   letter-spacing:3px;
 }
 
-.scoreboard{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:15px;
+.subtitle{
   font-size:14px;
+  opacity:0.7;
 }
 
-.timer-circle{
-  width:140px;
-  height:140px;
-  border-radius:50%;
-  border:6px solid #C6A75E;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:28px;
-  margin:20px auto;
+.fade{
+  animation:fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
@@ -72,100 +87,93 @@ button{
 
 <div class="container">
 
-<div class="card scoreboard">
-  <div>👤 Jogador 1: <span id="score1">0</span></div>
-  <div>👤 Jogador 2: <span id="score2">0</span></div>
+<div class="energy-container">
+  <div class="energy-bar" id="energyBar"></div>
+</div>
+<p class="subtitle">Energia da Conexão</p>
+
+<div id="home" class="card fade">
+  <h2>Midnight</h2>
+  <p class="subtitle">Toque para iniciar o ritual</p>
+  <button onclick="drawCard()">Sortear Momento</button>
 </div>
 
-<div id="home" class="card">
-  <h2>Midnight Cards</h2>
-  <button onclick="drawCard()">Sortear Carta</button>
-</div>
-
-<div id="cardScreen" class="card hidden">
+<div id="cardScreen" class="card hidden fade">
   <h3 id="name"></h3>
-  <div class="stars" id="stars"></div>
   <p id="desc"></p>
-  <button onclick="startChallenge()">Iniciar Desafio</button>
-  <button onclick="goHome()">Voltar</button>
+  <button onclick="startMoment()">Iniciar Conexão</button>
 </div>
 
-<div id="challengeScreen" class="card hidden">
-  <h3>Modo Desafio</h3>
-  <div class="timer-circle" id="timer">60</div>
-  <button onclick="finishChallenge(1)">Ponto Jogador 1</button>
-  <button onclick="finishChallenge(2)">Ponto Jogador 2</button>
+<div id="momentScreen" class="card hidden fade">
+  <h3>Conectem-se</h3>
+  <div class="timer" id="timer">60</div>
+</div>
+
+<div id="feedbackScreen" class="card hidden fade">
+  <h3>Como foi esse momento?</h3>
+  <button onclick="addEnergy(5)">❤️ Conectado</button>
+  <button onclick="addEnergy(8)">✨ Intenso</button>
+  <button onclick="addEnergy(10)">🔥 Marcante</button>
 </div>
 
 </div>
 
 <script>
 
-let score1 = localStorage.getItem("score1") || 0;
-let score2 = localStorage.getItem("score2") || 0;
-document.getElementById("score1").innerText = score1;
-document.getElementById("score2").innerText = score2;
+let energy = localStorage.getItem("energy") || 0;
+energy = parseInt(energy);
+updateEnergyBar();
 
-const cards = [];
-for(let i=1;i<=52;i++){
-  cards.push({
-    id:i,
-    name:"Carta "+i,
-    intensity: Math.floor(Math.random()*5)+1,
-    desc:"Desafio especial nível "+(Math.floor(Math.random()*5)+1)
-  });
-}
+const cards = [
+  {name:"Olhar Profundo", desc:"Mantenham contato visual em silêncio."},
+  {name:"Respiração Sincronizada", desc:"Respirem no mesmo ritmo."},
+  {name:"Abraço Demorado", desc:"Permaneçam próximos sem falar."},
+  {name:"Toque Lento", desc:"Explorem o toque com delicadeza."},
+  {name:"Proximidade Silenciosa", desc:"Apenas sintam a presença um do outro."}
+];
 
-let currentCard = null;
-let countdown = null;
 let timeLeft = 60;
+let countdown;
 
 function drawCard(){
-  currentCard = cards[Math.floor(Math.random()*cards.length)];
-  document.getElementById("name").innerText = currentCard.name;
-  document.getElementById("stars").innerText = "★".repeat(currentCard.intensity);
-  document.getElementById("desc").innerText = currentCard.desc;
+  const random = cards[Math.floor(Math.random()*cards.length)];
+  document.getElementById("name").innerText = random.name;
+  document.getElementById("desc").innerText = random.desc;
   switchScreen("cardScreen");
 }
 
-function startChallenge(){
+function startMoment(){
   timeLeft = 60;
   document.getElementById("timer").innerText = timeLeft;
-  switchScreen("challengeScreen");
+  switchScreen("momentScreen");
 
   countdown = setInterval(()=>{
     timeLeft--;
     document.getElementById("timer").innerText = timeLeft;
     if(timeLeft<=0){
       clearInterval(countdown);
+      switchScreen("feedbackScreen");
     }
   },1000);
 }
 
-function finishChallenge(player){
-  clearInterval(countdown);
-
-  if(player === 1){
-    score1++;
-    localStorage.setItem("score1", score1);
-    document.getElementById("score1").innerText = score1;
-  }else{
-    score2++;
-    localStorage.setItem("score2", score2);
-    document.getElementById("score2").innerText = score2;
-  }
-
-  goHome();
+function addEnergy(amount){
+  energy += amount;
+  localStorage.setItem("energy", energy);
+  updateEnergyBar();
+  switchScreen("home");
 }
 
-function goHome(){
-  switchScreen("home");
+function updateEnergyBar(){
+  let percent = Math.min(energy,100);
+  document.getElementById("energyBar").style.width = percent+"%";
 }
 
 function switchScreen(screen){
   document.getElementById("home").classList.add("hidden");
   document.getElementById("cardScreen").classList.add("hidden");
-  document.getElementById("challengeScreen").classList.add("hidden");
+  document.getElementById("momentScreen").classList.add("hidden");
+  document.getElementById("feedbackScreen").classList.add("hidden");
   document.getElementById(screen).classList.remove("hidden");
 }
 
