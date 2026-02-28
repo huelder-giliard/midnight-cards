@@ -1,101 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Ritual – Verdade ou Desafio</title>
-
-<style>
-body{
-  margin:0;
-  background:radial-gradient(circle at center,#1a1a1f 0%,#0B0B0D 70%);
-  color:#C6A75E;
-  font-family:Georgia, serif;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
-.container{
-  width:90%;
-  max-width:420px;
-  text-align:center;
-}
-
-.card{
-  background:rgba(20,20,25,0.95);
-  padding:30px;
-  border-radius:30px;
-  box-shadow:0 0 40px rgba(198,167,94,0.25);
-}
-
-button{
-  background:linear-gradient(145deg,#C6A75E,#a88d4f);
-  border:none;
-  padding:14px;
-  border-radius:15px;
-  font-weight:bold;
-  margin-top:12px;
-  width:100%;
-  color:#000;
-}
-
-.hidden{ display:none; }
-
-.energy-container{
-  width:100%;
-  height:12px;
-  background:#222;
-  border-radius:10px;
-  margin-bottom:15px;
-  overflow:hidden;
-}
-
-.energy-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(to right,#8B0000,#C6A75E);
-  transition:width 0.6s ease;
-}
-
-.level{
-  font-size:13px;
-  opacity:0.7;
-  margin-bottom:10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="energy-container">
-  <div class="energy-bar" id="energyBar"></div>
-</div>
-<p class="level" id="levelText">Nível 1 – Aquecimento</p>
-
-<div id="home" class="card">
-  <h2>Ritual</h2>
-  <button onclick="chooseMode('verdade')">Verdade</button>
-  <button onclick="chooseMode('desafio')">Desafio</button>
-</div>
-
-<div id="playScreen" class="card hidden">
-  <h3 id="prompt"></h3>
-  <button onclick="complete(5)">Leve</button>
-  <button onclick="complete(8)">Intenso</button>
-  <button onclick="complete(10)">Marcante</button>
-</div>
-
-</div>
-
 <script>
 
 let energy = localStorage.getItem("energy") || 0;
 energy = parseInt(energy);
-updateEnergy();
+
+let usedTruths = [];
+let usedChallenges = [];
 
 function getLevel(){
   if(energy < 25) return 1;
@@ -108,58 +17,94 @@ function updateEnergy(){
   let percent = Math.min(energy,100);
   document.getElementById("energyBar").style.width = percent + "%";
 
-  const level = getLevel();
   const levels = {
     1:"Nível 1 – Aquecimento",
     2:"Nível 2 – Conexão",
     3:"Nível 3 – Intensidade",
     4:"Nível 4 – Entrega"
   };
-  document.getElementById("levelText").innerText = levels[level];
+  document.getElementById("levelText").innerText = levels[getLevel()];
 }
 
 const truths = {
-  1:[
-    "Qual parte do meu corpo você mais gosta?",
-    "Quando você mais sentiu desejo por mim?"
-  ],
-  2:[
-    "O que mais te excita na nossa química?",
-    "Qual fantasia leve você nunca me contou?"
-  ],
-  3:[
-    "Qual cenário mais te provoca imaginar comigo?",
-    "Qual momento íntimo nosso ficou na sua mente?"
-  ],
-  4:[
-    "Qual pensamento ousado você já teve comigo?",
-    "Qual limite você gostaria de explorar juntos?"
-  ]
+1:[
+"Qual parte do meu corpo você sente mais vontade de tocar?",
+"O que em mim mais desperta seu desejo?",
+"Qual foi o momento mais provocante que tivemos?",
+"Quando você sente mais química entre nós?",
+"Que tipo de toque mais te arrepia?"
+],
+2:[
+"Como você gosta de ser provocado antes de algo mais intenso?",
+"Qual fantasia leve você gostaria de experimentar comigo?",
+"O que te faz perder o controle aos poucos?",
+"Como você prefere que eu conduza você?",
+"O que mais aumenta sua excitação lentamente?"
+],
+3:[
+"Qual cenário íntimo mais te estimula imaginar comigo?",
+"Você prefere dominar ou ser conduzido? Por quê?",
+"O que mais te deixa vulnerável comigo?",
+"Qual parte do seu corpo quer que eu explore mais?",
+"Qual foi seu pensamento mais ousado recentemente?"
+],
+4:[
+"Qual limite você sente vontade de explorar juntos?",
+"Qual fantasia você ainda não teve coragem de contar?",
+"O que te faria se entregar completamente?",
+"Como você gosta que a tensão aumente antes do ápice?",
+"Qual momento nosso você quer repetir de forma mais intensa?"
+]
 };
 
 const challenges = {
-  1:[
-    "Mantenha contato visual por 30 segundos.",
-    "Sussurre algo provocante."
-  ],
-  2:[
-    "Beije lentamente por 1 minuto.",
-    "Conduza um toque demorado."
-  ],
-  3:[
-    "Tire uma peça de roupa com elegância.",
-    "Assuma o controle por 2 minutos."
-  ],
-  4:[
-    "Guie um momento de proximidade intensa.",
-    "Descreva em voz baixa o que deseja fazer."
-  ]
+1:[
+"Mantenha contato visual por 40 segundos.",
+"Sussurre algo provocante no ouvido.",
+"Toque lentamente minhas mãos por 1 minuto.",
+"Aproxime-se e segure minha cintura sem falar.",
+"Faça um elogio sensual em voz baixa."
+],
+2:[
+"Beije lentamente por 1 minuto.",
+"Explore meu pescoço com delicadeza.",
+"Conduza meu movimento por 2 minutos.",
+"Use apenas o toque para provocar.",
+"Deslize as mãos pelo meu corpo com calma."
+],
+3:[
+"Tire uma peça de roupa com elegância.",
+"Assuma o controle por 2 minutos.",
+"Guie um momento de provocação prolongada.",
+"Use apenas o olhar para me provocar.",
+"Segure meus pulsos suavemente e conduza."
+],
+4:[
+"Guie um momento intenso sem falar.",
+"Provoque lentamente até eu pedir para continuar.",
+"Use apenas toques leves por 2 minutos.",
+"Controle o ritmo completamente.",
+"Descreva em voz baixa o que deseja fazer."
+]
 };
+
+function getRandom(list, usedArray){
+  if(usedArray.length >= list.length){
+    usedArray.length = 0;
+  }
+
+  let available = list.filter(item => !usedArray.includes(item));
+  let random = available[Math.floor(Math.random()*available.length)];
+  usedArray.push(random);
+  return random;
+}
 
 function chooseMode(type){
   const level = getLevel();
   const list = type === 'verdade' ? truths[level] : challenges[level];
-  const random = list[Math.floor(Math.random()*list.length)];
+  const used = type === 'verdade' ? usedTruths : usedChallenges;
+
+  const random = getRandom(list, used);
   document.getElementById("prompt").innerText = random;
   switchScreen("playScreen");
 }
@@ -180,6 +125,3 @@ function switchScreen(screen){
 updateEnergy();
 
 </script>
-
-</body>
-</html>
