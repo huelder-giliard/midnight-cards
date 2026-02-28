@@ -18,31 +18,29 @@ body{
   text-align:center;
 }
 
+.container{
+  width:90%;
+  max-width:400px;
+}
+
 .card{
   background:#111;
-  padding:30px;
+  padding:25px;
   border-radius:25px;
-  box-shadow:0 0 30px rgba(198,167,94,0.35);
-  width:85%;
-  max-width:360px;
+  box-shadow:0 0 30px rgba(198,167,94,0.3);
 }
 
 h1{
-  font-size:22px;
-  margin-bottom:10px;
-}
-
-h2{
-  margin-top:10px;
+  font-size:20px;
 }
 
 button{
   background:#C6A75E;
   border:none;
-  padding:15px;
+  padding:14px;
   border-radius:12px;
   font-weight:bold;
-  margin-top:20px;
+  margin-top:15px;
   width:100%;
 }
 
@@ -52,84 +50,113 @@ button{
   letter-spacing:3px;
 }
 
-svg{
-  margin-top:10px;
+.timer{
+  font-size:22px;
+  margin-top:15px;
+}
+
+.hidden{
+  display:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-<h1>Midnight Cards</h1>
+<div class="container">
 
-<!-- SILHUETA PREMIUM -->
-<svg width="240" height="220" viewBox="0 0 240 220">
+<div id="home" class="card">
+  <h1>Midnight Cards</h1>
+  <p id="userId"></p>
+  <button onclick="drawCard()">Sortear Carta</button>
+</div>
 
-  <!-- Corpo esquerdo -->
-  <path d="
-    M80 170
-    Q85 130 100 110
-    Q110 100 105 85
-    Q100 70 90 80
-    Q75 95 70 130
-    Q65 155 80 170
-  "
-  stroke="#C6A75E"
-  stroke-width="2.5"
-  fill="none"
-  stroke-linecap="round"
-  stroke-linejoin="round"/>
+<div id="cardScreen" class="card hidden">
+  <h2 id="name"></h2>
+  <div class="stars" id="stars"></div>
+  <p id="desc"></p>
+  <button onclick="startChallenge()">Iniciar Desafio</button>
+  <button onclick="goHome()">Voltar</button>
+</div>
 
-  <!-- Corpo direito -->
-  <path d="
-    M160 170
-    Q155 130 140 110
-    Q130 100 135 85
-    Q140 70 150 80
-    Q165 95 170 130
-    Q175 155 160 170
-  "
-  stroke="#C6A75E"
-  stroke-width="2.5"
-  fill="none"
-  stroke-linecap="round"
-  stroke-linejoin="round"/>
+<div id="challengeScreen" class="card hidden">
+  <h2>Modo Desafio</h2>
+  <div class="timer" id="timer">60</div>
+  <button onclick="finishChallenge()">Concluir</button>
+</div>
 
-  <!-- Aproximação dos rostos -->
-  <path d="
-    M105 95
-    Q120 105 135 95
-  "
-  stroke="#C6A75E"
-  stroke-width="2.5"
-  fill="none"
-  stroke-linecap="round"/>
-
-</svg>
-
-<h2 id="name">Toque para sortear</h2>
-<div class="stars" id="stars"></div>
-<p id="desc"></p>
-
-<button onclick="drawCard()">Sortear Carta</button>
 </div>
 
 <script>
-const cards = [
-{name:"Entrelaço Suave", intensity:2, desc:"Conexão lenta com contato visual."},
-{name:"Abraço Ardente", intensity:4, desc:"Aumente a proximidade e o ritmo."},
-{name:"Olhar Profundo", intensity:1, desc:"Segurem o olhar por 1 minuto."},
-{name:"Sintonia Lenta", intensity:3, desc:"Movimento sincronizado por 3 minutos."},
-{name:"Domínio Suave", intensity:5, desc:"Um conduz por 2 minutos."}
-];
 
-function drawCard(){
-  const random = cards[Math.floor(Math.random()*cards.length)];
-  document.getElementById("name").innerText = random.name;
-  document.getElementById("desc").innerText = random.desc;
-  document.getElementById("stars").innerText = "★".repeat(random.intensity);
+// LOGIN ANÔNIMO SIMPLES
+let userId = localStorage.getItem("midnight_user");
+if(!userId){
+  userId = "User_" + Math.floor(Math.random()*100000);
+  localStorage.setItem("midnight_user", userId);
 }
+document.getElementById("userId").innerText = "ID: " + userId;
+
+
+// 52 CARTAS
+const cards = [];
+for(let i=1;i<=52;i++){
+  cards.push({
+    id:i,
+    name:"Carta "+i,
+    intensity: Math.floor(Math.random()*5)+1,
+    desc:"Desafio especial nível "+(Math.floor(Math.random()*5)+1)
+  });
+}
+
+let currentCard = null;
+let countdown = null;
+let timeLeft = 60;
+
+
+// FUNÇÕES
+function drawCard(){
+  currentCard = cards[Math.floor(Math.random()*cards.length)];
+  document.getElementById("name").innerText = currentCard.name;
+  document.getElementById("stars").innerText = "★".repeat(currentCard.intensity);
+  document.getElementById("desc").innerText = currentCard.desc;
+  switchScreen("cardScreen");
+}
+
+function startChallenge(){
+  timeLeft = 60;
+  document.getElementById("timer").innerText = timeLeft;
+  switchScreen("challengeScreen");
+
+  countdown = setInterval(()=>{
+    timeLeft--;
+    document.getElementById("timer").innerText = timeLeft;
+    if(timeLeft<=0){
+      clearInterval(countdown);
+    }
+  },1000);
+}
+
+function finishChallenge(){
+  clearInterval(countdown);
+  let score = localStorage.getItem("score") || 0;
+  score++;
+  localStorage.setItem("score", score);
+  alert("Desafio concluído! Pontuação: "+score);
+  goHome();
+}
+
+function goHome(){
+  switchScreen("home");
+}
+
+function switchScreen(screen){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("cardScreen").classList.add("hidden");
+  document.getElementById("challengeScreen").classList.add("hidden");
+  document.getElementById(screen).classList.remove("hidden");
+}
+
 </script>
 
 </body>
